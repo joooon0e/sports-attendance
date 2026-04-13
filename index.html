@@ -311,12 +311,29 @@
     const grid = document.getElementById('clubGrid');
     grid.innerHTML = '<div class="loading">불러오는 중...</div>';
 
+    // 학생 목록 먼저 로드
+    const studentsSnap = await db.ref('/students').once('value');
+    allStudents = studentsSnap.val()
+      ? Object.entries(studentsSnap.val()).map(([id,s]) => ({id,...s}))
+      : [];
+
     let clubs = [];
 
     if (currentSession === '아침') {
-      // 오늘 시간표에서 아침 종목 가져오기
-      const snap = await db.ref(`/schedule/아침/${dayKey}`).once('value');
-      clubs = snap.val() || [];
+      // 학생 DB에서 모든 종목 자동 추출 (요일 제한 없음)
+      const rawClubs = [...new Set(allStudents.map(s => s.club).filter(Boolean))].sort();
+
+      // 배구부(남)과 배구부(여)가 모두 있으면 배구부(남+여) 합반 옵션도 추가
+      const combined = [];
+      const clubSet = new Set(rawClubs);
+      if (clubSet.has('배구부(남)') && clubSet.has('배구부(여)')) {
+        combined.push('배구부(남+여)');
+      }
+      if (clubSet.has('축구부(남)') && clubSet.has('축구부(여)')) {
+        combined.push('축구부(남+여)');
+      }
+      clubs = [...rawClubs, ...combined];
+
     } else {
       // 점심/방과후: 자율 종목 목록
       const snap = await db.ref(`/schedule/${currentSession}/sports`).once('value');
@@ -324,23 +341,20 @@
     }
 
     if (!clubs.length) {
-      grid.innerHTML = '<div class="empty-msg">오늘 등록된 종목이 없어요.<br>관리자에서 시간표를 설정해 주세요.</div>';
+      grid.innerHTML = '<div class="empty-msg">등록된 종목이 없어요.</div>';
       return;
     }
 
-    // 학생 수 미리 로드
-    const studentsSnap = await db.ref('/students').once('value');
-    allStudents = studentsSnap.val() ? Object.entries(studentsSnap.val()).map(([id,s]) => ({id,...s})) : [];
-
     grid.innerHTML = '';
     clubs.forEach(club => {
-      const clubStudents = currentSession === '아침'
-        ? allStudents.filter(s => s.club === club)
-        : allStudents;
+      // 아침: 해당 종목 학생 수 표시 / 점심·방과후: 전체
+      const count = currentSession === '아침'
+        ? getStudentsForClub(club).length + '명'
+        : '전체';
 
       const btn = document.createElement('button');
       btn.className = 'club-btn';
-      btn.innerHTML = `${club}<span class="count-badge">${currentSession === '아침' ? clubStudents.length + '명' : '전체'}</span>`;
+      btn.innerHTML = `${club}<span class="count-badge">${count}</span>`;
       btn.onclick = () => selectClub(club);
       grid.appendChild(btn);
     });
