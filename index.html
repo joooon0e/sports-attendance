@@ -317,15 +317,14 @@
       ? Object.entries(studentsSnap.val()).map(([id,s]) => ({id,...s}))
       : [];
 
-    // 학생 DB에서 모든 종목 자동 추출
-    const rawClubs = [...new Set(allStudents.map(s => s.club).filter(Boolean))].sort();
-    const clubSet = new Set(rawClubs);
-
-    // 배구부 남+여 합반 옵션만 추가 (축구는 제외)
-    const combined = [];
-    if (clubSet.has('배구부(남)') && clubSet.has('배구부(여)')) combined.push('배구부(남+여)');
-
-    const clubs = [...rawClubs, ...combined];
+    // 고정 순서로 종목 배치
+    const clubs = [
+      '농구부(남)',
+      '배구부(남)', '배구부(여)', '배구부(남+여)',
+      '배드민턴(남+여)',
+      '피구부(여)', '티볼부(여)', '연식야구(남)',
+      '축구부(남)', '축구부(여)',
+    ];
 
     if (!clubs.length) {
       grid.innerHTML = '<div class="empty-msg">등록된 종목이 없어요.</div>';
