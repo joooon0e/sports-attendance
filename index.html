@@ -79,6 +79,30 @@
     .session-btn.lunch:hover { background: #e8f5e9; }
     .session-btn.after { border-color: #7b1fa2; }
     .session-btn.after:hover { background: #f3e5f5; }
+    .session-btn.tournament { border-color: #c0392b; }
+    .session-btn.tournament:hover { background: #fdf0ef; }
+
+    /* 주말대회 시간 선택 오버레이 */
+    .tournament-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .tournament-overlay.show { display: flex; }
+    .tournament-box {
+      background: #fff; border-radius: 16px; padding: 32px 28px;
+      max-width: 340px; width: 90%; text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .tournament-box h3 { font-size: 20px; margin-bottom: 8px; color: #c0392b; }
+    .tournament-box p { font-size: 14px; color: #666; margin-bottom: 20px; }
+    .dur-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .dur-btn {
+      padding: 14px; border: 2px solid #ddd; border-radius: 10px;
+      background: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .dur-btn:hover { border-color: #c0392b; background: #fdf0ef; color: #c0392b; }
 
     /* 종목 선택 버튼 */
     .club-grid {
@@ -221,6 +245,28 @@
       🌆 방과후 자율
       <span class="time-badge">45분</span>
     </button>
+    <button class="session-btn tournament" onclick="openTournamentPicker()">
+      🏆 주말대회
+      <span class="time-badge" style="background:#c0392b">최대 4시간</span>
+    </button>
+  </div>
+</div>
+
+<!-- 주말대회 시간 선택 오버레이 -->
+<div class="tournament-overlay" id="tournamentOverlay">
+  <div class="tournament-box">
+    <h3>🏆 주말대회</h3>
+    <p>활동 시간을 선택해 주세요</p>
+    <div class="dur-grid">
+      <button class="dur-btn" onclick="selectTournament(60)">1시간<br><small>60분</small></button>
+      <button class="dur-btn" onclick="selectTournament(90)">1시간 30분<br><small>90분</small></button>
+      <button class="dur-btn" onclick="selectTournament(120)">2시간<br><small>120분</small></button>
+      <button class="dur-btn" onclick="selectTournament(150)">2시간 30분<br><small>150분</small></button>
+      <button class="dur-btn" onclick="selectTournament(180)">3시간<br><small>180분</small></button>
+      <button class="dur-btn" onclick="selectTournament(210)">3시간 30분<br><small>210분</small></button>
+      <button class="dur-btn" onclick="selectTournament(240)" style="grid-column:1/-1;border-color:#c0392b;color:#c0392b">4시간 (최대)<br><small>240분</small></button>
+    </div>
+    <button onclick="closeTournamentPicker()" style="width:100%;padding:10px;border:none;background:#eee;border-radius:8px;font-size:14px;cursor:pointer">취소</button>
   </div>
 </div>
 
@@ -300,6 +346,17 @@
   }
 
   // 스텝 1: 시간대 선택
+  function openTournamentPicker() {
+    document.getElementById('tournamentOverlay').classList.add('show');
+  }
+  function closeTournamentPicker() {
+    document.getElementById('tournamentOverlay').classList.remove('show');
+  }
+  function selectTournament(duration) {
+    closeTournamentPicker();
+    selectSession('주말대회', duration);
+  }
+
   async function selectSession(session, duration) {
     currentSession = session;
     currentDuration = duration;
