@@ -14,69 +14,145 @@
     .header {
       background: linear-gradient(135deg, #1a73e8, #0d47a1);
       color: white;
-      padding: 24px 20px 20px;
+      padding: 18px 20px;
       text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-    .header h1 { font-size: 26px; margin-bottom: 6px; }
-    .header .date-info { font-size: 17px; opacity: 0.85; margin-bottom: 4px; }
-    .header .sport-info {
-      font-size: 22px;
+    .header h1 { font-size: 22px; margin-bottom: 4px; }
+    .header .date-info { font-size: 15px; opacity: 0.85; }
+
+    /* 브레드크럼 */
+    .breadcrumb {
+      background: white;
+      padding: 10px 16px;
+      font-size: 14px;
+      color: #888;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .breadcrumb span { color: #1a73e8; cursor: pointer; }
+    .breadcrumb span:hover { text-decoration: underline; }
+
+    /* 스텝 공통 */
+    .step { padding: 20px; max-width: 900px; margin: 0 auto; }
+    .step-title {
+      font-size: 20px;
       font-weight: bold;
-      background: rgba(255,255,255,0.2);
+      color: #333;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    /* 세션 선택 버튼 */
+    .session-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .session-btn {
+      background: white;
+      border: 3px solid #e0e0e0;
+      border-radius: 16px;
+      padding: 30px 16px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .session-btn .time-badge {
       display: inline-block;
-      padding: 6px 20px;
-      border-radius: 20px;
+      background: #f0f4f8;
+      color: #666;
+      font-size: 13px;
+      font-weight: normal;
+      padding: 3px 10px;
+      border-radius: 12px;
       margin-top: 8px;
     }
-    .no-schedule {
-      text-align: center;
-      padding: 80px 20px;
-      color: #666;
-      font-size: 22px;
+    .session-btn.morning { border-color: #ff8f00; }
+    .session-btn.morning:hover { background: #fff8e1; }
+    .session-btn.lunch { border-color: #43a047; }
+    .session-btn.lunch:hover { background: #e8f5e9; }
+    .session-btn.after { border-color: #7b1fa2; }
+    .session-btn.after:hover { background: #f3e5f5; }
+
+    /* 종목 선택 버튼 */
+    .club-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
     }
+    .club-btn {
+      background: white;
+      border: 3px solid #e0e0e0;
+      border-radius: 14px;
+      padding: 22px 14px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      color: #333;
+    }
+    .club-btn:hover { background: #e8f0fe; border-color: #1a73e8; }
+    .club-btn .count-badge {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      font-weight: normal;
+      margin-top: 6px;
+    }
+
+    /* 학생 버튼 */
     .student-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 14px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
     }
     .student-btn {
       background: white;
       border: 3px solid #e0e0e0;
       border-radius: 14px;
-      padding: 18px 10px;
-      font-size: 20px;
+      padding: 16px 10px;
+      font-size: 19px;
       font-weight: bold;
       cursor: pointer;
-      transition: all 0.15s;
       text-align: center;
+      transition: all 0.15s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
       color: #333;
-      min-height: 90px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 5px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      gap: 4px;
     }
-    .student-btn .sub {
-      font-size: 12px;
-      color: #999;
-      font-weight: normal;
-    }
+    .student-btn .sub { font-size: 12px; color: #999; font-weight: normal; }
     .student-btn:active { transform: scale(0.96); }
     .student-btn.checked {
       background: #e8f5e9;
       border-color: #4caf50;
       color: #2e7d32;
     }
-    .student-btn.checked .check-label {
-      font-size: 13px;
-      color: #4caf50;
+    .student-btn.checked .check-label { font-size: 12px; color: #4caf50; }
+
+    /* 카운트 바 */
+    .count-bar {
+      text-align: center;
+      padding: 10px;
+      font-size: 15px;
+      color: #555;
+      background: white;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 0;
     }
+    .count-bar span { color: #1a73e8; font-weight: bold; }
+
+    /* 토스트 */
     .toast {
       position: fixed;
       bottom: 40px;
@@ -93,6 +169,7 @@
       white-space: nowrap;
     }
     .toast.show { opacity: 1; }
+
     .admin-link {
       position: fixed;
       top: 14px;
@@ -105,21 +182,13 @@
       cursor: pointer;
       font-size: 13px;
     }
-    .loading {
-      text-align: center;
-      padding: 80px;
-      font-size: 18px;
-      color: #888;
+
+    .loading { text-align: center; padding: 60px; font-size: 18px; color: #888; }
+    .empty-msg { text-align: center; padding: 40px; font-size: 16px; color: #888; }
+
+    @media (max-width: 600px) {
+      .session-grid { grid-template-columns: 1fr; }
     }
-    .count-bar {
-      text-align: center;
-      padding: 12px;
-      font-size: 16px;
-      color: #555;
-      background: white;
-      border-bottom: 1px solid #eee;
-    }
-    .count-bar span { color: #1a73e8; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -127,11 +196,45 @@
 <div class="header">
   <h1>스포츠클럽 출석체크</h1>
   <div class="date-info" id="dateInfo"></div>
-  <div id="sportWrap"></div>
 </div>
 
-<div id="countBar" class="count-bar" style="display:none"></div>
-<div id="content"><div class="loading">불러오는 중...</div></div>
+<div class="breadcrumb" id="breadcrumb">
+  <span onclick="goStep(1)">시간대 선택</span>
+</div>
+
+<div id="countBarWrap"></div>
+
+<!-- 스텝 1: 시간대 -->
+<div class="step" id="step1">
+  <div class="step-title">오늘 어떤 활동인가요?</div>
+  <div class="session-grid">
+    <button class="session-btn morning" onclick="selectSession('아침', 45)">
+      🌅 아침 오아시스
+      <span class="time-badge">45분</span>
+    </button>
+    <button class="session-btn lunch" onclick="selectSession('점심', 30)">
+      ☀️ 점심 자율
+      <span class="time-badge">30분</span>
+    </button>
+    <button class="session-btn after" onclick="selectSession('방과후', 45)">
+      🌆 방과후 자율
+      <span class="time-badge">45분</span>
+    </button>
+  </div>
+</div>
+
+<!-- 스텝 2: 종목 -->
+<div class="step" id="step2" style="display:none">
+  <div class="step-title">종목을 선택하세요</div>
+  <div class="club-grid" id="clubGrid"></div>
+</div>
+
+<!-- 스텝 3: 학생 -->
+<div class="step" id="step3" style="display:none">
+  <div class="step-title" id="step3Title">이름을 터치하세요</div>
+  <div class="student-grid" id="studentGrid"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 <button class="admin-link" onclick="location.href='admin.html'">관리자</button>
 
@@ -150,83 +253,161 @@
   const db = firebase.database();
 
   const DAY_KEYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
-  const DAY_NAMES = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
-
   const today = new Date();
-  const dayIdx = today.getDay();
-  const dayKey = DAY_KEYS[dayIdx];
+  const dayKey = DAY_KEYS[today.getDay()];
   const dateStr = today.toISOString().slice(0,10);
+  const dayNames = ['일','월','화','수','목','금','토'];
 
   document.getElementById('dateInfo').textContent =
-    `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일 ${DAY_NAMES[dayIdx]}`;
+    `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일 (${dayNames[today.getDay()]})`;
 
-  let todaySchedule = null;
-  let students = [];
+  let currentSession = null;
+  let currentDuration = 0;
+  let currentClub = null;
   let attendanceData = {};
+  let allStudents = [];
 
-  db.ref(`/schedule/${dayKey}`).once('value').then(snap => {
-    todaySchedule = snap.val();
+  // 스텝 이동
+  function goStep(n) {
+    document.getElementById('step1').style.display = n === 1 ? 'block' : 'none';
+    document.getElementById('step2').style.display = n === 2 ? 'block' : 'none';
+    document.getElementById('step3').style.display = n === 3 ? 'block' : 'none';
+    document.getElementById('countBarWrap').innerHTML = '';
+    updateBreadcrumb(n);
+  }
 
-    if (!todaySchedule || !todaySchedule.sport || dayIdx === 0 || dayIdx === 6) {
-      document.getElementById('sportWrap').innerHTML = '';
-      document.getElementById('content').innerHTML =
-        '<div class="no-schedule">🏖️ 오늘은 스포츠클럽이 없어요</div>';
+  function updateBreadcrumb(step) {
+    const bc = document.getElementById('breadcrumb');
+    if (step === 1) {
+      bc.innerHTML = '<span>시간대 선택</span>';
+    } else if (step === 2) {
+      bc.innerHTML = `<span onclick="goStep(1)">시간대 선택</span> › <b>${currentSession}</b>`;
+    } else {
+      bc.innerHTML = `<span onclick="goStep(1)">시간대 선택</span> › <span onclick="goStep(2)">${currentSession}</span> › <b>${currentClub}</b>`;
+    }
+  }
+
+  // 스텝 1: 시간대 선택
+  async function selectSession(session, duration) {
+    currentSession = session;
+    currentDuration = duration;
+    goStep(2);
+    await loadClubs();
+  }
+
+  // 스텝 2: 종목 로드
+  async function loadClubs() {
+    const grid = document.getElementById('clubGrid');
+    grid.innerHTML = '<div class="loading">불러오는 중...</div>';
+
+    let clubs = [];
+
+    if (currentSession === '아침') {
+      // 오늘 시간표에서 아침 종목 가져오기
+      const snap = await db.ref(`/schedule/아침/${dayKey}`).once('value');
+      clubs = snap.val() || [];
+    } else {
+      // 점심/방과후: 자율 종목 목록
+      const snap = await db.ref(`/schedule/${currentSession}/sports`).once('value');
+      clubs = snap.val() || [];
+    }
+
+    if (!clubs.length) {
+      grid.innerHTML = '<div class="empty-msg">오늘 등록된 종목이 없어요.<br>관리자에서 시간표를 설정해 주세요.</div>';
       return;
     }
 
-    document.getElementById('sportWrap').innerHTML =
-      `<div class="sport-info">${todaySchedule.sport} · ${todaySchedule.duration}분</div>`;
+    // 학생 수 미리 로드
+    const studentsSnap = await db.ref('/students').once('value');
+    allStudents = studentsSnap.val() ? Object.entries(studentsSnap.val()).map(([id,s]) => ({id,...s})) : [];
 
-    db.ref(`/attendance/${dateStr}`).on('value', snap => {
-      attendanceData = snap.val() || {};
-      loadStudents();
+    grid.innerHTML = '';
+    clubs.forEach(club => {
+      const clubStudents = currentSession === '아침'
+        ? allStudents.filter(s => s.club === club)
+        : allStudents;
+
+      const btn = document.createElement('button');
+      btn.className = 'club-btn';
+      btn.innerHTML = `${club}<span class="count-badge">${currentSession === '아침' ? clubStudents.length + '명' : '전체'}</span>`;
+      btn.onclick = () => selectClub(club);
+      grid.appendChild(btn);
     });
-  });
+  }
 
-  function loadStudents() {
-    db.ref('/students').once('value').then(snap => {
-      const data = snap.val();
-      if (!data) {
-        document.getElementById('content').innerHTML =
-          '<div class="no-schedule">등록된 학생이 없습니다.<br>관리자에서 학생을 등록해 주세요.</div>';
-        return;
-      }
-      students = Object.entries(data).map(([id, s]) => ({ id, ...s }));
-      students.sort((a,b) => {
-        if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
-        if (a.class !== b.class) return Number(a.class) - Number(b.class);
-        return Number(a.number) - Number(b.number);
-      });
+  // 스텝 3: 학생 선택
+  async function selectClub(club) {
+    currentClub = club;
+    goStep(3);
+    document.getElementById('step3Title').textContent = `${club} — 이름을 터치하세요`;
+
+    // 출석 데이터 로드
+    const attSnap = await db.ref(`/attendance/${dateStr}/${currentSession}/${currentClub}`).once('value');
+    attendanceData = attSnap.val() || {};
+
+    // 실시간 업데이트
+    db.ref(`/attendance/${dateStr}/${currentSession}/${currentClub}`).on('value', snap => {
+      attendanceData = snap.val() || {};
       renderStudents();
     });
+
+    renderStudents();
   }
 
   function renderStudents() {
-    const checkedCount = Object.keys(attendanceData).length;
-    const countBar = document.getElementById('countBar');
-    countBar.style.display = 'block';
-    countBar.innerHTML = `오늘 출석 <span>${checkedCount}</span> / ${students.length}명`;
+    // 아침: 해당 클럽 학생만 (남+여 합치기 처리 포함) / 점심·방과후: 전체
+    let students = currentSession === '아침'
+      ? getStudentsForClub(currentClub)
+      : allStudents;
 
-    const grid = document.createElement('div');
-    grid.className = 'student-grid';
+    students = [...students].sort((a,b) => {
+      if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
+      if (a.class !== b.class) return Number(a.class) - Number(b.class);
+      return Number(a.number) - Number(b.number);
+    });
+
+    const checkedCount = Object.keys(attendanceData).length;
+    document.getElementById('countBarWrap').innerHTML =
+      `<div class="count-bar">오늘 <b>${currentSession} ${currentClub}</b> 출석 <span>${checkedCount}</span> / ${students.length}명</div>`;
+
+    const grid = document.getElementById('studentGrid');
+    grid.innerHTML = '';
+
+    if (!students.length) {
+      grid.innerHTML = '<div class="empty-msg">등록된 학생이 없어요.</div>';
+      return;
+    }
 
     students.forEach(student => {
+      const checked = !!attendanceData[student.id];
       const btn = document.createElement('button');
-      btn.className = 'student-btn' + (attendanceData[student.id] ? ' checked' : '');
+      btn.className = 'student-btn' + (checked ? ' checked' : '');
       btn.innerHTML = `
         <span>${student.name}</span>
         <span class="sub">${student.grade}학년 ${student.class}반 ${student.number}번</span>
-        ${attendanceData[student.id] ? '<span class="check-label">✓ 출석완료</span>' : ''}
+        ${checked ? '<span class="check-label">✓ 출석완료</span>' : ''}
       `;
-      btn.onclick = () => checkAttendance(student, btn);
+      btn.onclick = () => checkAttendance(student);
       grid.appendChild(btn);
     });
-
-    document.getElementById('content').innerHTML = '';
-    document.getElementById('content').appendChild(grid);
   }
 
-  function checkAttendance(student, btn) {
+  // 남+여 합치기 처리: "배구부(남+여)" → 배구부(남), 배구부(여) 학생 모두
+  function getStudentsForClub(clubName) {
+    if (clubName.includes('+')) {
+      const match = clubName.match(/^(.+?)\((.+)\)$/);
+      if (match) {
+        const prefix = match[1];
+        const variants = match[2].split('+');
+        return allStudents.filter(s =>
+          variants.some(v => s.club === `${prefix}(${v})`)
+        );
+      }
+    }
+    return allStudents.filter(s => s.club === clubName);
+  }
+
+  function checkAttendance(student) {
     if (attendanceData[student.id]) {
       showToast(`${student.name} 학생은 이미 출석했어요!`);
       return;
@@ -236,15 +417,15 @@
       grade: student.grade,
       class: student.class,
       number: student.number,
-      sport: todaySchedule.sport,
-      duration: todaySchedule.duration,
-      activityType: todaySchedule.activityType || '스포츠클럽',
+      club: student.club || currentClub,
+      sport: currentClub,
+      session: currentSession,
+      duration: currentDuration,
       timestamp: firebase.database.ServerValue.TIMESTAMP,
       date: dateStr
     };
-    db.ref(`/attendance/${dateStr}/${student.id}`).set(record).then(() => {
-      showToast(`✓ ${student.name} 출석 완료!`);
-    });
+    db.ref(`/attendance/${dateStr}/${currentSession}/${currentClub}/${student.id}`).set(record)
+      .then(() => showToast(`✓ ${student.name} 출석 완료!`));
   }
 
   function showToast(msg) {

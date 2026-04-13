@@ -6,26 +6,16 @@
   <title>관리자 페이지</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-      background: #f0f4f8;
-      min-height: 100vh;
-    }
+    body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: #f0f4f8; min-height: 100vh; }
 
-    /* 로그인 화면 */
     .login-overlay {
       position: fixed; inset: 0;
       background: linear-gradient(135deg, #1a73e8, #0d47a1);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 999;
+      display: flex; align-items: center; justify-content: center; z-index: 999;
     }
     .login-box {
-      background: white;
-      border-radius: 16px;
-      padding: 40px 36px;
-      text-align: center;
-      width: 320px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      background: white; border-radius: 16px; padding: 40px 36px;
+      text-align: center; width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     }
     .login-box h2 { font-size: 22px; margin-bottom: 24px; color: #333; }
     .login-box input {
@@ -33,190 +23,152 @@
       border: 2px solid #e0e0e0; border-radius: 8px;
       text-align: center; letter-spacing: 6px; margin-bottom: 16px;
     }
-    .login-box button {
-      width: 100%; padding: 14px; font-size: 18px;
-      background: #1a73e8; color: white; border: none;
-      border-radius: 8px; cursor: pointer;
-    }
+    .login-box button { width: 100%; padding: 14px; font-size: 18px; background: #1a73e8; color: white; border: none; border-radius: 8px; cursor: pointer; }
     .login-box .error { color: #e53935; font-size: 14px; margin-top: 10px; }
 
-    /* 메인 레이아웃 */
-    .top-bar {
-      background: #1a73e8;
-      color: white;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .top-bar { background: #1a73e8; color: white; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
     .top-bar h1 { font-size: 20px; }
     .top-bar a { color: white; font-size: 14px; text-decoration: none; opacity: 0.85; }
 
-    .tabs {
-      display: flex;
-      background: white;
-      border-bottom: 2px solid #e0e0e0;
-      overflow-x: auto;
-    }
-    .tab-btn {
-      padding: 14px 20px;
-      font-size: 15px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      color: #666;
-      white-space: nowrap;
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
-    }
+    .tabs { display: flex; background: white; border-bottom: 2px solid #e0e0e0; overflow-x: auto; }
+    .tab-btn { padding: 14px 18px; font-size: 15px; border: none; background: none; cursor: pointer; color: #666; white-space: nowrap; border-bottom: 3px solid transparent; margin-bottom: -2px; }
     .tab-btn.active { color: #1a73e8; border-bottom-color: #1a73e8; font-weight: bold; }
 
-    .tab-panel { display: none; padding: 24px 20px; max-width: 900px; margin: 0 auto; }
+    .tab-panel { display: none; padding: 20px; max-width: 900px; margin: 0 auto; }
     .tab-panel.active { display: block; }
 
-    /* 공통 컴포넌트 */
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .card h3 { font-size: 17px; margin-bottom: 16px; color: #333; }
+    .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card h3 { font-size: 16px; margin-bottom: 14px; color: #333; }
 
-    .form-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-    .form-row input, .form-row select {
-      flex: 1; min-width: 80px;
-      padding: 10px 12px; font-size: 15px;
-      border: 2px solid #e0e0e0; border-radius: 8px;
-    }
-    .btn {
-      padding: 10px 20px; font-size: 15px;
-      border: none; border-radius: 8px; cursor: pointer;
-    }
+    .form-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+    .form-row input, .form-row select { flex: 1; min-width: 80px; padding: 9px 12px; font-size: 14px; border: 2px solid #e0e0e0; border-radius: 8px; }
+
+    .btn { padding: 9px 18px; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; }
     .btn-primary { background: #1a73e8; color: white; }
     .btn-danger { background: #e53935; color: white; }
     .btn-success { background: #43a047; color: white; }
-    .btn-gray { background: #e0e0e0; color: #333; }
 
-    /* 학생 목록 */
-    .student-list { margin-top: 16px; }
-    .student-item {
-      display: flex; align-items: center;
-      padding: 10px 14px;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 15px;
-    }
+    .student-list { margin-top: 12px; }
+    .student-item { display: flex; align-items: center; padding: 9px 12px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
     .student-item:last-child { border-bottom: none; }
     .student-item span { flex: 1; }
-    .student-item button { margin-left: 8px; }
 
     /* 시간표 */
-    .schedule-grid { display: grid; gap: 12px; }
-    .schedule-row {
-      display: flex; align-items: center; gap: 10px;
-      flex-wrap: wrap;
-    }
-    .schedule-day {
-      width: 50px; font-weight: bold; color: #1a73e8; flex-shrink: 0;
-    }
-    .schedule-row input, .schedule-row select {
-      flex: 1; min-width: 100px;
-      padding: 9px 12px; font-size: 14px;
-      border: 2px solid #e0e0e0; border-radius: 8px;
-    }
+    .schedule-section { margin-bottom: 20px; }
+    .schedule-section h4 { font-size: 15px; color: #555; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+    .day-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .day-label { width: 44px; font-weight: bold; color: #1a73e8; padding-top: 9px; flex-shrink: 0; }
+    .clubs-input { flex: 1; }
+    .clubs-input input { width: 100%; padding: 9px 12px; font-size: 14px; border: 2px solid #e0e0e0; border-radius: 8px; }
+    .clubs-input small { color: #888; font-size: 12px; margin-top: 3px; display: block; }
 
     /* 출석 현황 */
-    .attendance-table {
-      width: 100%; border-collapse: collapse; margin-top: 12px;
-    }
-    .attendance-table th {
-      background: #f5f5f5; padding: 10px 12px;
-      text-align: left; font-size: 14px; border-bottom: 2px solid #e0e0e0;
-    }
-    .attendance-table td {
-      padding: 9px 12px; font-size: 14px;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .attendance-table tr:hover td { background: #f9f9f9; }
+    .att-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .att-table th { background: #f5f5f5; padding: 9px 12px; text-align: left; font-size: 13px; border-bottom: 2px solid #e0e0e0; }
+    .att-table td { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+    .att-table tr:hover td { background: #f9f9f9; }
 
-    .empty-msg { color: #888; text-align: center; padding: 30px; font-size: 15px; }
+    .session-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 10px;
+      font-size: 12px; font-weight: bold;
+    }
+    .badge-아침 { background: #fff8e1; color: #f57f17; }
+    .badge-점심 { background: #e8f5e9; color: #2e7d32; }
+    .badge-방과후 { background: #f3e5f5; color: #6a1b9a; }
 
-    /* 내보내기 */
-    .export-form label { display: block; margin-bottom: 6px; font-size: 14px; color: #555; }
-    .export-form input {
-      width: 100%; padding: 10px; font-size: 15px;
-      border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 12px;
-    }
-    .summary-box {
-      background: #e8f5e9; border-radius: 8px; padding: 14px;
-      font-size: 14px; margin-top: 12px; color: #2e7d32;
-    }
+    .empty-msg { color: #888; text-align: center; padding: 30px; font-size: 14px; }
+    .export-form label { display: block; margin-bottom: 5px; font-size: 13px; color: #555; }
+    .export-form input { width: 100%; padding: 9px; font-size: 14px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
-<!-- 로그인 -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <h2>관리자 로그인</h2>
+    <h2>🔐 관리자 로그인</h2>
     <input type="password" id="pwInput" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doLogin()">
     <button onclick="doLogin()">로그인</button>
     <div class="error" id="loginError"></div>
   </div>
 </div>
 
-<!-- 메인 -->
 <div id="mainContent" style="display:none">
   <div class="top-bar">
-    <h1>스포츠클럽 관리</h1>
+    <h1>스포츠클럽 관리자</h1>
     <a href="index.html">← 출석 화면으로</a>
   </div>
-
   <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('students')">학생 관리</button>
-    <button class="tab-btn" onclick="showTab('schedule')">시간표 설정</button>
-    <button class="tab-btn" onclick="showTab('attendance')">출석 현황</button>
-    <button class="tab-btn" onclick="showTab('export')">엑셀 내보내기</button>
-    <button class="tab-btn" onclick="showTab('settings')">설정</button>
+    <button class="tab-btn active" onclick="showTab('students', this)">학생 관리</button>
+    <button class="tab-btn" onclick="showTab('schedule', this)">시간표 설정</button>
+    <button class="tab-btn" onclick="showTab('attendance', this)">출석 현황</button>
+    <button class="tab-btn" onclick="showTab('export', this)">엑셀 내보내기</button>
+    <button class="tab-btn" onclick="showTab('settings', this)">설정</button>
   </div>
 
-  <!-- 학생 관리 탭 -->
+  <!-- 학생 관리 -->
   <div class="tab-panel active" id="tab-students">
     <div class="card">
       <h3>학생 추가</h3>
       <div class="form-row">
-        <input type="text" id="sName" placeholder="이름" style="max-width:120px">
-        <input type="number" id="sGrade" placeholder="학년" min="1" max="6" style="max-width:80px">
-        <input type="number" id="sClass" placeholder="반" min="1" max="20" style="max-width:80px">
-        <input type="number" id="sNum" placeholder="번호" min="1" max="50" style="max-width:80px">
+        <input type="text" id="sName" placeholder="이름" style="max-width:110px">
+        <input type="number" id="sGrade" placeholder="학년" min="1" max="3" style="max-width:70px">
+        <input type="number" id="sClass" placeholder="반" min="1" max="20" style="max-width:70px">
+        <input type="number" id="sNum" placeholder="번호" min="1" max="50" style="max-width:70px">
+        <select id="sClub" style="min-width:130px">
+          <option value="">종목 선택</option>
+        </select>
         <button class="btn btn-primary" onclick="addStudent()">추가</button>
       </div>
-      <small style="color:#888">여러 명 추가 시 한 명씩 입력해 주세요.</small>
     </div>
     <div class="card">
       <h3>학생 목록</h3>
-      <div class="student-list" id="studentList"><div class="empty-msg">등록된 학생이 없습니다.</div></div>
+      <div class="form-row" style="margin-bottom:12px">
+        <select id="filterClub" onchange="renderStudentList()" style="flex:none;width:160px">
+          <option value="">전체 종목</option>
+        </select>
+        <input type="text" id="searchName" placeholder="이름 검색" oninput="renderStudentList()" style="max-width:160px">
+      </div>
+      <div class="student-list" id="studentList"></div>
     </div>
   </div>
 
-  <!-- 시간표 탭 -->
+  <!-- 시간표 설정 -->
   <div class="tab-panel" id="tab-schedule">
     <div class="card">
-      <h3>요일별 종목 및 시간 설정</h3>
-      <div class="schedule-grid" id="scheduleGrid"></div>
-      <br>
-      <button class="btn btn-primary" onclick="saveSchedule()">저장</button>
+      <h3>아침 오아시스 (45분) — 요일별 종목</h3>
+      <p style="font-size:13px;color:#888;margin-bottom:14px">쉼표(,)로 구분해서 입력. 예: 배구부(남), 배구부(여)</p>
+      <div class="schedule-section" id="morningSchedule"></div>
+      <button class="btn btn-primary" onclick="saveSchedule('아침')">저장</button>
+    </div>
+    <div class="card">
+      <h3>점심 자율 (30분) — 이용 가능 종목</h3>
+      <div class="form-row">
+        <input type="text" id="lunchSports" placeholder="예: 배드민턴, 배구, 축구, 피구">
+        <button class="btn btn-primary" onclick="saveFreeSchedule('점심')">저장</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>방과후 자율 (45분) — 이용 가능 종목</h3>
+      <div class="form-row">
+        <input type="text" id="afterSports" placeholder="예: 배드민턴, 배구, 축구">
+        <button class="btn btn-primary" onclick="saveFreeSchedule('방과후')">저장</button>
+      </div>
     </div>
   </div>
 
-  <!-- 출석 현황 탭 -->
+  <!-- 출석 현황 -->
   <div class="tab-panel" id="tab-attendance">
     <div class="card">
       <div class="form-row">
-        <input type="date" id="attDate" style="flex:none;width:180px">
+        <input type="date" id="attDate" style="flex:none;width:170px">
+        <select id="attSession" style="flex:none;width:130px">
+          <option value="">전체 시간대</option>
+          <option value="아침">아침 오아시스</option>
+          <option value="점심">점심 자율</option>
+          <option value="방과후">방과후 자율</option>
+        </select>
         <button class="btn btn-primary" onclick="loadAttendance()">조회</button>
-        <button class="btn btn-danger" onclick="deleteAttendance()">오늘 출석 전체 삭제</button>
+        <button class="btn btn-danger" onclick="deleteAttendance()">선택 삭제</button>
       </div>
     </div>
     <div class="card">
@@ -224,7 +176,7 @@
     </div>
   </div>
 
-  <!-- 내보내기 탭 -->
+  <!-- 엑셀 내보내기 -->
   <div class="tab-panel" id="tab-export">
     <div class="card">
       <h3>엑셀 다운로드</h3>
@@ -233,27 +185,27 @@
         <input type="date" id="exportFrom">
         <label>종료 날짜</label>
         <input type="date" id="exportTo">
-        <button class="btn btn-success" onclick="exportExcel()" style="width:100%;padding:14px;font-size:16px">
-          엑셀 다운로드
+        <button class="btn btn-success" onclick="exportExcel()" style="width:100%;padding:13px;font-size:16px">
+          📥 엑셀 다운로드
         </button>
       </div>
     </div>
   </div>
 
-  <!-- 설정 탭 -->
+  <!-- 설정 -->
   <div class="tab-panel" id="tab-settings">
     <div class="card">
       <h3>비밀번호 변경</h3>
       <div class="form-row">
         <input type="password" id="newPw" placeholder="새 비밀번호">
-        <input type="password" id="newPwConfirm" placeholder="비밀번호 확인">
+        <input type="password" id="newPwConfirm" placeholder="확인">
         <button class="btn btn-primary" onclick="changePw()">변경</button>
       </div>
-      <div id="pwMsg" style="margin-top:8px;font-size:14px;color:green"></div>
+      <div id="pwMsg" style="margin-top:8px;font-size:13px"></div>
     </div>
     <div class="card">
       <h3>전체 출석 데이터 삭제</h3>
-      <p style="color:#888;font-size:14px;margin-bottom:12px">모든 날짜의 출석 기록이 삭제됩니다. 신중히 사용해 주세요.</p>
+      <p style="color:#888;font-size:13px;margin-bottom:12px">모든 날짜의 출석 기록이 삭제됩니다.</p>
       <button class="btn btn-danger" onclick="deleteAllAttendance()">전체 삭제</button>
     </div>
   </div>
@@ -274,12 +226,13 @@
   });
   const db = firebase.database();
 
-  const DEFAULT_PW = '1234';
   const DAY_KEYS = ['monday','tuesday','wednesday','thursday','friday'];
-  const DAY_NAMES = ['월요일','화요일','수요일','목요일','금요일'];
-  const ACTIVITY_TYPES = ['스포츠클럽', '점심 틈새운동', '방과후'];
+  const DAY_NAMES = ['월','화','수','목','금'];
+  const DEFAULT_PW = '1234';
+  let allStudents = [];
+  let allClubs = [];
 
-  // --- 로그인 ---
+  // 로그인
   async function doLogin() {
     const input = document.getElementById('pwInput').value;
     const snap = await db.ref('/settings/adminPassword').once('value');
@@ -293,55 +246,85 @@
     }
   }
 
-  // --- 초기화 ---
   function initApp() {
-    loadStudentList();
+    loadStudents();
     loadScheduleForm();
-    // 오늘 날짜 기본값
     const today = new Date().toISOString().slice(0,10);
     document.getElementById('attDate').value = today;
     document.getElementById('exportFrom').value = today;
     document.getElementById('exportTo').value = today;
   }
 
-  // --- 탭 전환 ---
-  function showTab(name) {
+  function showTab(name, btn) {
     document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById('tab-'+name).classList.add('active');
-    event.target.classList.add('active');
+    btn.classList.add('active');
   }
 
-  // --- 학생 관리 ---
+  // 학생 관리
+  function loadStudents() {
+    db.ref('/students').on('value', snap => {
+      const data = snap.val() || {};
+      allStudents = Object.entries(data).map(([id,s]) => ({id,...s}));
+      allClubs = [...new Set(allStudents.map(s => s.club).filter(Boolean))].sort();
+
+      // 종목 셀렉트 업데이트
+      const updateSelect = (id) => {
+        const sel = document.getElementById(id);
+        const cur = sel.value;
+        sel.innerHTML = `<option value="">전체 종목</option>` +
+          allClubs.map(c => `<option value="${c}" ${c===cur?'selected':''}>${c}</option>`).join('');
+      };
+
+      const sClub = document.getElementById('sClub');
+      const curVal = sClub.value;
+      sClub.innerHTML = `<option value="">종목 선택</option>` +
+        allClubs.map(c => `<option value="${c}" ${c===curVal?'selected':''}>${c}</option>`).join('');
+
+      updateSelect('filterClub');
+      renderStudentList();
+    });
+  }
+
+  function renderStudentList() {
+    const filterClub = document.getElementById('filterClub').value;
+    const search = document.getElementById('searchName').value.trim();
+
+    let list = allStudents.filter(s => {
+      if (filterClub && s.club !== filterClub) return false;
+      if (search && !s.name.includes(search)) return false;
+      return true;
+    });
+
+    list.sort((a,b) => {
+      if ((a.club||'') !== (b.club||'')) return (a.club||'').localeCompare(b.club||'');
+      if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
+      if (a.class !== b.class) return Number(a.class) - Number(b.class);
+      return Number(a.number) - Number(b.number);
+    });
+
+    const el = document.getElementById('studentList');
+    if (!list.length) { el.innerHTML = '<div class="empty-msg">학생이 없습니다.</div>'; return; }
+
+    el.innerHTML = list.map(s =>
+      `<div class="student-item">
+        <span><b>${s.name}</b> &nbsp; ${s.grade}학년 ${s.class}반 ${s.number}번 &nbsp; <span style="color:#1a73e8">${s.club||'-'}</span></span>
+        <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="deleteStudent('${s.id}','${s.name}')">삭제</button>
+      </div>`
+    ).join('');
+  }
+
   function addStudent() {
     const name = document.getElementById('sName').value.trim();
     const grade = document.getElementById('sGrade').value;
     const cls = document.getElementById('sClass').value;
     const num = document.getElementById('sNum').value;
-    if (!name || !grade || !cls || !num) { alert('모든 항목을 입력해 주세요.'); return; }
-    db.ref('/students').push({ name, grade, class: cls, number: num }).then(() => {
+    const club = document.getElementById('sClub').value;
+    if (!name || !grade || !cls || !num || !club) { alert('모든 항목을 입력해 주세요.'); return; }
+    db.ref('/students').push({ name, grade, class: cls, number: num, club }).then(() => {
       document.getElementById('sName').value = '';
       document.getElementById('sNum').value = '';
-    });
-  }
-
-  function loadStudentList() {
-    db.ref('/students').on('value', snap => {
-      const data = snap.val();
-      const list = document.getElementById('studentList');
-      if (!data) { list.innerHTML = '<div class="empty-msg">등록된 학생이 없습니다.</div>'; return; }
-      const students = Object.entries(data).map(([id,s]) => ({id,...s}));
-      students.sort((a,b) => {
-        if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
-        if (a.class !== b.class) return Number(a.class) - Number(b.class);
-        return Number(a.number) - Number(b.number);
-      });
-      list.innerHTML = students.map(s =>
-        `<div class="student-item">
-          <span>${s.grade}학년 ${s.class}반 ${s.number}번 &nbsp;<strong>${s.name}</strong></span>
-          <button class="btn btn-danger" style="padding:6px 12px;font-size:13px" onclick="deleteStudent('${s.id}','${s.name}')">삭제</button>
-        </div>`
-      ).join('');
     });
   }
 
@@ -350,114 +333,147 @@
     db.ref(`/students/${id}`).remove();
   }
 
-  // --- 시간표 ---
-  function loadScheduleForm() {
-    db.ref('/schedule').once('value').then(snap => {
-      const data = snap.val() || {};
-      const grid = document.getElementById('scheduleGrid');
-      grid.innerHTML = DAY_KEYS.map((key, i) => {
-        const s = data[key] || {};
-        const typeOptions = ACTIVITY_TYPES.map(t =>
-          `<option value="${t}" ${s.activityType===t?'selected':''}>${t}</option>`
-        ).join('');
-        return `
-          <div class="schedule-row">
-            <div class="schedule-day">${DAY_NAMES[i]}</div>
-            <input type="text" id="sport_${key}" placeholder="종목 (예: 배드민턴)" value="${s.sport||''}">
-            <select id="type_${key}">${typeOptions}</select>
-            <input type="number" id="dur_${key}" placeholder="분" min="1" max="120" value="${s.duration||45}" style="max-width:80px">
+  // 시간표
+  async function loadScheduleForm() {
+    const snap = await db.ref('/schedule').once('value');
+    const data = snap.val() || {};
+
+    // 아침
+    const morningDiv = document.getElementById('morningSchedule');
+    morningDiv.innerHTML = DAY_KEYS.map((key,i) => {
+      const clubs = (data['아침'] && data['아침'][key]) ? data['아침'][key].join(', ') : '';
+      return `
+        <div class="day-row">
+          <div class="day-label">${DAY_NAMES[i]}요일</div>
+          <div class="clubs-input">
+            <input type="text" id="morning_${key}" placeholder="종목 없으면 비워두기" value="${clubs}">
+            <small>여러 종목: 쉼표로 구분 (예: 배구부(남), 배구부(여))</small>
           </div>
-        `;
-      }).join('');
-    });
+        </div>`;
+    }).join('');
+
+    // 점심/방과후
+    if (data['점심'] && data['점심'].sports) {
+      document.getElementById('lunchSports').value = data['점심'].sports.join(', ');
+    }
+    if (data['방과후'] && data['방과후'].sports) {
+      document.getElementById('afterSports').value = data['방과후'].sports.join(', ');
+    }
   }
 
-  function saveSchedule() {
+  function saveSchedule(session) {
     const updates = {};
     DAY_KEYS.forEach(key => {
-      updates[key] = {
-        sport: document.getElementById(`sport_${key}`).value.trim(),
-        activityType: document.getElementById(`type_${key}`).value,
-        duration: Number(document.getElementById(`dur_${key}`).value)
-      };
+      const val = document.getElementById(`${session === '아침' ? 'morning' : 'after'}_${key}`).value.trim();
+      updates[key] = val ? val.split(',').map(s => s.trim()).filter(Boolean) : [];
     });
-    db.ref('/schedule').set(updates).then(() => alert('시간표가 저장되었습니다.'));
+    db.ref(`/schedule/${session}`).set(updates).then(() => alert('저장됐어요!'));
   }
 
-  // --- 출석 현황 ---
+  function saveFreeSchedule(session) {
+    const inputId = session === '점심' ? 'lunchSports' : 'afterSports';
+    const val = document.getElementById(inputId).value.trim();
+    const sports = val ? val.split(',').map(s => s.trim()).filter(Boolean) : [];
+    db.ref(`/schedule/${session}/sports`).set(sports).then(() => alert('저장됐어요!'));
+  }
+
+  // 출석 현황
   async function loadAttendance() {
     const date = document.getElementById('attDate').value;
+    const session = document.getElementById('attSession').value;
     if (!date) { alert('날짜를 선택해 주세요.'); return; }
+
     const snap = await db.ref(`/attendance/${date}`).once('value');
     const data = snap.val();
     const result = document.getElementById('attendanceResult');
+
     if (!data) {
-      result.innerHTML = '<div class="empty-msg">해당 날짜의 출석 기록이 없습니다.</div>';
+      result.innerHTML = '<div class="empty-msg">해당 날짜 출석 기록이 없습니다.</div>';
       return;
     }
-    const records = Object.values(data).sort((a,b) => {
-      if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
-      if (a.class !== b.class) return Number(a.class) - Number(b.class);
-      return Number(a.number) - Number(b.number);
+
+    let records = [];
+    Object.entries(data).forEach(([sess, clubs]) => {
+      if (session && sess !== session) return;
+      Object.entries(clubs).forEach(([club, students]) => {
+        Object.values(students).forEach(s => {
+          records.push({...s, session: sess, sport: club});
+        });
+      });
     });
+
+    records.sort((a,b) => {
+      const sOrder = {'아침':0,'점심':1,'방과후':2};
+      if (sOrder[a.session] !== sOrder[b.session]) return sOrder[a.session] - sOrder[b.session];
+      if (a.sport !== b.sport) return a.sport.localeCompare(b.sport);
+      if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
+      return Number(a.class) - Number(b.class);
+    });
+
     result.innerHTML = `
-      <p style="margin-bottom:10px;color:#555;font-size:14px">총 ${records.length}명 출석</p>
-      <table class="attendance-table">
-        <tr><th>학년</th><th>반</th><th>번호</th><th>이름</th><th>종목</th><th>활동유형</th><th>시간</th></tr>
+      <p style="margin-bottom:10px;color:#555;font-size:13px">총 ${records.length}건</p>
+      <table class="att-table">
+        <tr><th>시간대</th><th>종목</th><th>학년</th><th>반</th><th>번호</th><th>이름</th><th>시간</th></tr>
         ${records.map(r => `
           <tr>
+            <td><span class="session-badge badge-${r.session}">${r.session}</span></td>
+            <td>${r.sport}</td>
             <td>${r.grade}학년</td><td>${r.class}반</td><td>${r.number}번</td>
-            <td><strong>${r.name}</strong></td>
-            <td>${r.sport}</td><td>${r.activityType||'-'}</td><td>${r.duration}분</td>
+            <td><b>${r.name}</b></td>
+            <td>${r.duration}분</td>
           </tr>
         `).join('')}
-      </table>
-    `;
+      </table>`;
   }
 
   async function deleteAttendance() {
     const date = document.getElementById('attDate').value;
+    const session = document.getElementById('attSession').value;
     if (!date) { alert('날짜를 선택해 주세요.'); return; }
-    if (!confirm(`${date} 출석 기록을 전체 삭제할까요?`)) return;
-    await db.ref(`/attendance/${date}`).remove();
-    alert('삭제되었습니다.');
-    document.getElementById('attendanceResult').innerHTML = '<div class="empty-msg">출석 기록이 삭제되었습니다.</div>';
+    const target = session ? `${date} ${session}` : `${date} 전체`;
+    if (!confirm(`${target} 출석 기록을 삭제할까요?`)) return;
+    const path = session ? `/attendance/${date}/${session}` : `/attendance/${date}`;
+    await db.ref(path).remove();
+    alert('삭제됐어요.');
+    document.getElementById('attendanceResult').innerHTML = '<div class="empty-msg">삭제됐습니다.</div>';
   }
 
-  // --- 엑셀 내보내기 ---
+  // 엑셀 내보내기
   async function exportExcel() {
     const from = document.getElementById('exportFrom').value;
     const to = document.getElementById('exportTo').value;
     if (!from || !to) { alert('날짜를 선택해 주세요.'); return; }
-    if (from > to) { alert('시작 날짜가 종료 날짜보다 늦습니다.'); return; }
 
     const snap = await db.ref('/attendance').once('value');
     const all = snap.val() || {};
 
-    const rows = [['날짜','학년','반','번호','이름','종목','활동유형','활동시간(분)']];
+    const rows = [['날짜','시간대','종목','학년','반','번호','이름','활동시간(분)']];
     const dates = Object.keys(all).filter(d => d >= from && d <= to).sort();
 
     dates.forEach(date => {
-      const records = Object.values(all[date]).sort((a,b) => {
-        if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
-        if (a.class !== b.class) return Number(a.class) - Number(b.class);
-        return Number(a.number) - Number(b.number);
-      });
-      records.forEach(r => {
-        rows.push([date, r.grade+'학년', r.class+'반', r.number+'번', r.name, r.sport, r.activityType||'-', r.duration]);
+      Object.entries(all[date]).forEach(([session, clubs]) => {
+        Object.entries(clubs).forEach(([club, students]) => {
+          Object.values(students).sort((a,b) => {
+            if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
+            if (a.class !== b.class) return Number(a.class) - Number(b.class);
+            return Number(a.number) - Number(b.number);
+          }).forEach(r => {
+            rows.push([date, session, club, r.grade+'학년', r.class+'반', r.number+'번', r.name, r.duration]);
+          });
+        });
       });
     });
 
-    if (rows.length === 1) { alert('해당 기간에 출석 기록이 없습니다.'); return; }
+    if (rows.length === 1) { alert('출석 기록이 없습니다.'); return; }
 
     const ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [12,8,6,8,10,12,14,14].map(w => ({wch:w}));
+    ws['!cols'] = [12,10,14,8,6,8,10,12].map(w => ({wch:w}));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, '출석기록');
     XLSX.writeFile(wb, `스포츠클럽_출석_${from}_${to}.xlsx`);
   }
 
-  // --- 설정 ---
+  // 설정
   async function changePw() {
     const pw = document.getElementById('newPw').value;
     const confirm2 = document.getElementById('newPwConfirm').value;
@@ -465,15 +481,15 @@
     if (!pw) { msg.style.color='red'; msg.textContent='비밀번호를 입력해 주세요.'; return; }
     if (pw !== confirm2) { msg.style.color='red'; msg.textContent='비밀번호가 일치하지 않습니다.'; return; }
     await db.ref('/settings/adminPassword').set(pw);
-    msg.style.color='green'; msg.textContent='비밀번호가 변경되었습니다.';
+    msg.style.color='green'; msg.textContent='변경됐어요!';
     document.getElementById('newPw').value = '';
     document.getElementById('newPwConfirm').value = '';
   }
 
   async function deleteAllAttendance() {
-    if (!confirm('모든 출석 기록을 삭제할까요? 이 작업은 되돌릴 수 없습니다.')) return;
+    if (!confirm('모든 출석 기록을 삭제할까요?')) return;
     await db.ref('/attendance').remove();
-    alert('전체 출석 기록이 삭제되었습니다.');
+    alert('삭제됐어요.');
   }
 </script>
 </body>
