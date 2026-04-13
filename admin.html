@@ -102,6 +102,7 @@
     <button class="tab-btn" onclick="showTab('attendance', this)">출석 현황</button>
     <button class="tab-btn" onclick="showTab('rate', this)">출석률</button>
     <button class="tab-btn" onclick="showTab('inactive', this)">미출석 관리</button>
+    <button class="tab-btn" onclick="showTab('tournament', this)">대회 출석 입력</button>
     <button class="tab-btn" onclick="showTab('export', this)">엑셀 내보내기</button>
     <button class="tab-btn" onclick="showTab('settings', this)">설정</button>
   </div>
@@ -143,6 +144,7 @@
           <option value="아침">아침 오아시스</option>
           <option value="점심">점심 자율</option>
           <option value="방과후">방과후 자율</option>
+          <option value="주말대회">주말대회</option>
         </select>
         <button class="btn btn-primary" onclick="loadAttendance()">조회</button>
         <button class="btn btn-danger" onclick="deleteAttendance()">선택 삭제</button>
@@ -194,6 +196,44 @@
     </div>
   </div>
 
+  <!-- 대회 출석 입력 -->
+  <div class="tab-panel" id="tab-tournament">
+    <div class="card">
+      <h3>주말대회 출석 입력</h3>
+      <p style="font-size:13px;color:#888;margin-bottom:14px">주말에 열린 대회 참가 학생을 직접 선택해 출석을 기록해요. 최대 4시간(240분)까지 인정.</p>
+      <div class="form-row" style="flex-wrap:wrap;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:12px;color:#666">날짜</label>
+          <input type="date" id="tournamentDate" style="width:160px">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:12px;color:#666">종목</label>
+          <select id="tournamentClub" style="width:160px">
+            <option value="">종목 선택</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="font-size:12px;color:#666">활동 시간(분, 최대 240)</label>
+          <input type="number" id="tournamentDuration" value="240" min="30" max="240" step="30" style="width:120px">
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="btn btn-primary" onclick="loadTournamentStudents()">학생 불러오기</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="tournamentStudentCard" style="display:none">
+      <h3 id="tournamentStudentTitle">참가 학생 선택</h3>
+      <div style="margin-bottom:10px">
+        <label style="font-size:13px;cursor:pointer">
+          <input type="checkbox" id="tournamentSelectAll" onchange="toggleTournamentAll(this)"> 전체 선택
+        </label>
+      </div>
+      <div id="tournamentStudentList" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
+      <button class="btn btn-success" onclick="saveTournamentAttendance()" style="width:100%;padding:12px;font-size:15px">출석 저장</button>
+      <div id="tournamentMsg" style="margin-top:10px;font-size:13px;text-align:center"></div>
+    </div>
+  </div>
+
   <!-- 엑셀 내보내기 -->
   <div class="tab-panel" id="tab-export">
     <div class="card">
@@ -213,7 +253,7 @@
   <!-- 설정 -->
   <div class="tab-panel" id="tab-settings">
     <div class="card">
-      <h3>비밀번호 변경</h3>
+      <h3>관리자 비밀번호 변경</h3>
       <div class="form-row">
         <input type="password" id="newPw" placeholder="새 비밀번호">
         <input type="password" id="newPwConfirm" placeholder="확인">
@@ -221,9 +261,20 @@
       </div>
       <div id="pwMsg" style="margin-top:8px;font-size:13px"></div>
     </div>
+    <div class="card" style="border:2px solid #c0392b">
+      <h3 style="color:#c0392b">최종관리자 비밀번호 변경</h3>
+      <p style="color:#888;font-size:13px;margin-bottom:12px">전체 출석 삭제 등 위험 기능에 사용되는 비밀번호입니다. 최종관리자(선생님)만 알아야 합니다.</p>
+      <div class="form-row">
+        <input type="password" id="superPwCurrent" placeholder="현재 최종관리자 비밀번호">
+        <input type="password" id="superPwNew" placeholder="새 비밀번호">
+        <input type="password" id="superPwConfirm" placeholder="확인">
+        <button class="btn btn-danger" onclick="changeSuperPw()">변경</button>
+      </div>
+      <div id="superPwMsg" style="margin-top:8px;font-size:13px"></div>
+    </div>
     <div class="card">
       <h3>전체 출석 데이터 삭제</h3>
-      <p style="color:#888;font-size:13px;margin-bottom:12px">모든 날짜의 출석 기록이 삭제됩니다.</p>
+      <p style="color:#888;font-size:13px;margin-bottom:12px">모든 날짜의 출석 기록이 삭제됩니다. <strong>최종관리자 비밀번호</strong>가 필요합니다.</p>
       <button class="btn btn-danger" onclick="deleteAllAttendance()">전체 삭제</button>
     </div>
   </div>
@@ -313,6 +364,7 @@
       updateSelect('filterClub');
       updateSelect('rateClub', '종목 선택');
       updateSelect('inactiveClub', '전체 종목');
+      updateSelect('tournamentClub', '종목 선택');
       renderStudentList();
     });
   }
@@ -644,6 +696,69 @@
   }
 
   // 엑셀 내보내기 (종목별 시트)
+  // 대회 출석
+  function loadTournamentStudents() {
+    const date = document.getElementById('tournamentDate').value;
+    const club = document.getElementById('tournamentClub').value;
+    const dur = Number(document.getElementById('tournamentDuration').value);
+    if (!date) { alert('날짜를 선택해 주세요.'); return; }
+    if (!club) { alert('종목을 선택해 주세요.'); return; }
+    if (!dur || dur < 1 || dur > 240) { alert('활동 시간을 1~240분 사이로 입력해 주세요.'); return; }
+
+    const students = allStudents.filter(s => s.club === club)
+      .sort((a, b) => {
+        if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
+        if (a.class !== b.class) return Number(a.class) - Number(b.class);
+        return Number(a.number) - Number(b.number);
+      });
+
+    if (students.length === 0) { alert('해당 종목에 등록된 학생이 없어요.'); return; }
+
+    document.getElementById('tournamentStudentTitle').textContent =
+      `${date} ${club} 대회 참가 학생 선택 (${dur}분)`;
+
+    const listEl = document.getElementById('tournamentStudentList');
+    listEl.innerHTML = '';
+    students.forEach(s => {
+      const sid = `${s.grade}_${s.class}_${s.number}_${s.name}`;
+      const label = document.createElement('label');
+      label.style.cssText = 'display:flex;align-items:center;gap:5px;background:#f5f5f5;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:13px;border:1px solid #ddd';
+      label.innerHTML = `<input type="checkbox" class="tournament-student-cb" value="${sid}" data-grade="${s.grade}" data-class="${s.class}" data-number="${s.number}" data-name="${s.name}" data-club="${s.club}"> ${s.grade}-${s.class} ${s.number}번 ${s.name}`;
+      listEl.appendChild(label);
+    });
+
+    document.getElementById('tournamentSelectAll').checked = false;
+    document.getElementById('tournamentMsg').textContent = '';
+    document.getElementById('tournamentStudentCard').style.display = '';
+  }
+
+  function toggleTournamentAll(cb) {
+    document.querySelectorAll('.tournament-student-cb').forEach(el => el.checked = cb.checked);
+  }
+
+  async function saveTournamentAttendance() {
+    const date = document.getElementById('tournamentDate').value;
+    const dur = Number(document.getElementById('tournamentDuration').value);
+    const checked = [...document.querySelectorAll('.tournament-student-cb:checked')];
+    const msg = document.getElementById('tournamentMsg');
+
+    if (checked.length === 0) { msg.style.color='red'; msg.textContent='참가 학생을 최소 1명 선택해 주세요.'; return; }
+
+    const updates = {};
+    checked.forEach(cb => {
+      const sid = cb.value;
+      const { grade, class: cls, number, name, club } = cb.dataset;
+      const path = `/attendance/${date}/주말대회/${club}/${sid}`;
+      updates[path] = { grade, class: cls, number, name, club, duration: dur, timestamp: Date.now() };
+    });
+
+    await db.ref().update(updates);
+    msg.style.color='green';
+    msg.textContent = `${checked.length}명 출석이 저장됐어요!`;
+    document.getElementById('tournamentSelectAll').checked = false;
+    document.querySelectorAll('.tournament-student-cb').forEach(el => el.checked = false);
+  }
+
   async function exportExcel() {
     const from = document.getElementById('exportFrom').value;
     const to = document.getElementById('exportTo').value;
@@ -654,93 +769,84 @@
 
     const dates = Object.keys(all).filter(d => d >= from && d <= to).sort();
 
-    // 학생의 실제 종목부(club) 기준으로 묶기
-    // → 배구부(남+여) 합반 세션도 배구부(남), 배구부(여) 시트에 각각 포함됨
-    const byClub = {}; // { 학생종목부: [ row, ... ] }
+    // 출석 데이터 수집: attMap[club][sid][date] = 분
+    const attMap = {};
+    const clubDateSet = {}; // club → Set<date>
 
     dates.forEach(date => {
-      Object.entries(all[date]).forEach(([session, clubs]) => {
-        Object.entries(clubs).forEach(([sport, students]) => {
+      const dateSessions = all[date] || {};
+      Object.entries(dateSessions).forEach(([session, sessionClubs]) => {
+        Object.entries(sessionClubs).forEach(([sport, students]) => {
           Object.values(students).forEach(r => {
-            // 학생의 실제 종목부 사용 (없으면 세션 sport명 사용)
             const clubKey = r.club || sport;
-            if (!byClub[clubKey]) byClub[clubKey] = [];
-            byClub[clubKey].push({
-              date, session, sport,
-              grade: r.grade, class: r.class, number: r.number,
-              name: r.name, duration: r.duration
-            });
+            const sid = `${r.grade}_${r.class}_${r.number}_${r.name}`;
+            if (!attMap[clubKey]) attMap[clubKey] = {};
+            if (!attMap[clubKey][sid]) attMap[clubKey][sid] = {};
+            attMap[clubKey][sid][date] = (attMap[clubKey][sid][date] || 0) + Number(r.duration || 0);
+            if (!clubDateSet[clubKey]) clubDateSet[clubKey] = new Set();
+            clubDateSet[clubKey].add(date);
           });
         });
       });
     });
 
     const wb = XLSX.utils.book_new();
-    const header = ['날짜','시간대','세션종목','학년','반','번호','이름','활동시간(분)'];
 
-    // 누가기록 요약 시트: 전체 학생 + 총 활동시간 (미출석 포함)
-    const summaryRows = [['종목부','학년','반','번호','이름','총 활동시간(분)','출석 횟수']];
-    const timeByStudent = {};
-    Object.values(byClub).flat().forEach(r => {
-      const key = `${r.grade}_${r.class}_${r.number}_${r.name}`;
-      if (!timeByStudent[key]) timeByStudent[key] = { total: 0, count: 0 };
-      timeByStudent[key].total += Number(r.duration) || 0;
-      timeByStudent[key].count += 1;
-    });
+    // 정해진 순서 + 나머지 종목
+    const clubOrder = [
+      '농구부(남)',
+      '배구부(남)', '배구부(여)',
+      '배드민턴(남+여)',
+      '피구부(여)', '티볼부(여)', '연식야구(남)',
+      '축구부(남)', '축구부(여)',
+    ];
+    const allRegisteredClubs = [...new Set(allStudents.map(s => s.club).filter(Boolean))];
+    const allClubKeys = [
+      ...clubOrder.filter(c => allRegisteredClubs.includes(c) || attMap[c]),
+      ...allRegisteredClubs.filter(c => !clubOrder.includes(c)).sort(),
+    ];
 
-    const sortedStudents = [...allStudents].sort((a,b) => {
-      if ((a.club||'') !== (b.club||'')) return (a.club||'').localeCompare(b.club||'');
-      if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
-      if (a.class !== b.class) return Number(a.class) - Number(b.class);
-      return Number(a.number) - Number(b.number);
-    });
-
-    sortedStudents.forEach(s => {
-      const key = `${s.grade}_${s.class}_${s.number}_${s.name}`;
-      const stat = timeByStudent[key] || { total: 0, count: 0 };
-      summaryRows.push([s.club||'-', s.grade+'학년', s.class+'반', s.number+'번', s.name, stat.total, stat.count]);
-    });
-
-    const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
-    wsSummary['!cols'] = [14,8,6,8,10,16,10].map(w => ({wch:w}));
-    XLSX.utils.book_append_sheet(wb, wsSummary, '누가기록 요약');
-
-    if (!Object.keys(byClub).length) {
-      XLSX.writeFile(wb, `스포츠클럽_출석_${from}_${to}.xlsx`);
+    if (allClubKeys.length === 0) {
+      alert('선택 기간에 출석 데이터가 없어요.');
       return;
     }
 
-    // 전체 합계 시트
-    const allRows = [header];
-    Object.entries(byClub).sort((a,b) => a[0].localeCompare(b[0])).forEach(([club, records]) => {
-      records.sort((a,b) => {
-        if (a.date !== b.date) return a.date.localeCompare(b.date);
-        if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
-        if (a.class !== b.class) return Number(a.class) - Number(b.class);
-        return Number(a.number) - Number(b.number);
-      }).forEach(r => {
-        allRows.push([r.date, r.session, r.grade+'학년', r.class+'반', r.number+'번', r.name, r.duration]);
-      });
-    });
-    const wsAll = XLSX.utils.aoa_to_sheet(allRows);
-    wsAll['!cols'] = [12,10,8,6,8,10,12].map(w => ({wch:w}));
-    XLSX.utils.book_append_sheet(wb, wsAll, '전체');
+    allClubKeys.forEach(club => {
+      // 등록 학생 (가나다순 → 학년/반/번호 순)
+      const clubStudents = allStudents
+        .filter(s => s.club === club)
+        .sort((a, b) => {
+          if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
+          if (a.class !== b.class) return Number(a.class) - Number(b.class);
+          return Number(a.number) - Number(b.number);
+        });
 
-    // 종목별 시트
-    Object.entries(byClub).sort((a,b) => a[0].localeCompare(b[0])).forEach(([club, records]) => {
-      const rows = [header];
-      records.sort((a,b) => {
-        if (a.date !== b.date) return a.date.localeCompare(b.date);
-        if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
-        if (a.class !== b.class) return Number(a.class) - Number(b.class);
-        return Number(a.number) - Number(b.number);
-      }).forEach(r => {
-        rows.push([r.date, r.session, r.sport, r.grade+'학년', r.class+'반', r.number+'번', r.name, r.duration]);
+      // 이 종목 출석이 있었던 날짜들
+      const clubDates = [...(clubDateSet[club] || new Set())].sort();
+
+      // 헤더: 학년 반 번호 이름 | 날짜들(M/D 형식) | 총시간(분)
+      const dateHeaders = clubDates.map(d => {
+        const parts = d.split('-');
+        return `${Number(parts[1])}/${Number(parts[2])}`;
       });
+      const header = ['학년', '반', '번호', '이름', ...dateHeaders, '총시간(분)'];
+
+      const rows = [header];
+      clubStudents.forEach(s => {
+        const sid = `${s.grade}_${s.class}_${s.number}_${s.name}`;
+        const sAtt = (attMap[club] && attMap[club][sid]) || {};
+        let total = 0;
+        const cells = clubDates.map(d => {
+          const mins = sAtt[d] || 0;
+          total += mins;
+          return mins > 0 ? mins : '';
+        });
+        rows.push([s.grade + '학년', s.class + '반', s.number + '번', s.name, ...cells, total || '']);
+      });
+
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols'] = [12,10,14,8,6,8,10,12].map(w => ({wch:w}));
-      // 시트 이름 30자 제한
-      const sheetName = club.length > 30 ? club.slice(0,30) : club;
+      ws['!cols'] = [8, 6, 8, 10, ...clubDates.map(() => 8), 12].map(w => ({ wch: w }));
+      const sheetName = club.length > 30 ? club.slice(0, 30) : club;
       XLSX.utils.book_append_sheet(wb, ws, sheetName);
     });
 
@@ -760,8 +866,30 @@
     document.getElementById('newPwConfirm').value = '';
   }
 
+  async function changeSuperPw() {
+    const current = document.getElementById('superPwCurrent').value;
+    const newPw = document.getElementById('superPwNew').value;
+    const confirm2 = document.getElementById('superPwConfirm').value;
+    const msg = document.getElementById('superPwMsg');
+    if (!current || !newPw) { msg.style.color='red'; msg.textContent='모두 입력해 주세요.'; return; }
+    if (newPw !== confirm2) { msg.style.color='red'; msg.textContent='새 비밀번호가 일치하지 않습니다.'; return; }
+    const snap = await db.ref('/settings/superAdminPassword').once('value');
+    const stored = snap.val() || 'super1234';
+    if (current !== stored) { msg.style.color='red'; msg.textContent='현재 비밀번호가 틀렸어요.'; return; }
+    await db.ref('/settings/superAdminPassword').set(newPw);
+    msg.style.color='green'; msg.textContent='최종관리자 비밀번호가 변경됐어요!';
+    document.getElementById('superPwCurrent').value = '';
+    document.getElementById('superPwNew').value = '';
+    document.getElementById('superPwConfirm').value = '';
+  }
+
   async function deleteAllAttendance() {
-    if (!confirm('모든 출석 기록을 삭제할까요?')) return;
+    const snap = await db.ref('/settings/superAdminPassword').once('value');
+    const stored = snap.val() || 'super1234';
+    const input = prompt('전체 삭제는 최종관리자만 할 수 있어요.\n최종관리자 비밀번호를 입력하세요:');
+    if (input === null) return; // 취소
+    if (input !== stored) { alert('비밀번호가 틀렸어요. 삭제하지 않았어요.'); return; }
+    if (!confirm('정말로 모든 출석 기록을 삭제할까요?\n이 작업은 되돌릴 수 없어요.')) return;
     await db.ref('/attendance').remove();
     alert('삭제됐어요.');
   }
