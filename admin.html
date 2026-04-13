@@ -101,6 +101,7 @@
     <button class="tab-btn active" onclick="showTab('students', this)">학생 관리</button>
     <button class="tab-btn" onclick="showTab('schedule', this)">시간표 설정</button>
     <button class="tab-btn" onclick="showTab('attendance', this)">출석 현황</button>
+    <button class="tab-btn" onclick="showTab('rate', this)">출석률</button>
     <button class="tab-btn" onclick="showTab('inactive', this)">미출석 관리</button>
     <button class="tab-btn" onclick="showTab('export', this)">엑셀 내보내기</button>
     <button class="tab-btn" onclick="showTab('settings', this)">설정</button>
@@ -199,6 +200,29 @@
     </div>
     <div class="card">
       <div id="attendanceResult"><div class="empty-msg">날짜를 선택하고 조회해 주세요.</div></div>
+    </div>
+  </div>
+
+  <!-- 출석률 -->
+  <div class="tab-panel" id="tab-rate">
+    <div class="card">
+      <h3>종목별 출석률</h3>
+      <div class="form-row">
+        <select id="rateClub" style="flex:1">
+          <option value="">종목 선택</option>
+        </select>
+        <input type="date" id="rateFrom" style="flex:none;width:150px">
+        <span style="padding-top:9px;color:#555">~</span>
+        <input type="date" id="rateTo" style="flex:none;width:150px">
+        <button class="btn btn-primary" onclick="loadRate()">조회</button>
+      </div>
+      <div style="font-size:12px;color:#aaa;margin-top:4px">기간을 비워두면 전체 기간 기준</div>
+    </div>
+    <div class="card" id="rateSummary" style="display:none">
+      <div id="rateSummaryContent"></div>
+    </div>
+    <div class="card">
+      <div id="rateResult"><div class="empty-msg">종목을 선택하고 조회해 주세요.</div></div>
     </div>
   </div>
 
@@ -314,13 +338,20 @@
     db.ref('/students').on('value', snap => {
       const data = snap.val() || {};
       allStudents = Object.entries(data).map(([id,s]) => ({id,...s}));
-      allClubs = [...new Set(allStudents.map(s => s.club).filter(Boolean))].sort();
+      const clubOrder = ['농구부(남)','배구부(남)','배구부(여)','배드민턴(남+여)','피구부(여)','티볼부(여)','연식야구(남)','축구부(남)','축구부(여)'];
+      allClubs = [...new Set(allStudents.map(s => s.club).filter(Boolean))].sort((a,b) => {
+        const ai = clubOrder.indexOf(a), bi = clubOrder.indexOf(b);
+        if (ai !== -1 && bi !== -1) return ai - bi;
+        if (ai !== -1) return -1;
+        if (bi !== -1) return 1;
+        return a.localeCompare(b);
+      });
 
       // 종목 셀렉트 업데이트
-      const updateSelect = (id) => {
+      const updateSelect = (id, placeholder='전체 종목') => {
         const sel = document.getElementById(id);
         const cur = sel.value;
-        sel.innerHTML = `<option value="">전체 종목</option>` +
+        sel.innerHTML = `<option value="">${placeholder}</option>` +
           allClubs.map(c => `<option value="${c}" ${c===cur?'selected':''}>${c}</option>`).join('');
       };
 
@@ -330,6 +361,8 @@
         allClubs.map(c => `<option value="${c}" ${c===curVal?'selected':''}>${c}</option>`).join('');
 
       updateSelect('filterClub');
+      updateSelect('rateClub', '종목 선택');
+      updateSelect('inactiveClub', '전체 종목');
       renderStudentList();
     });
   }
@@ -505,6 +538,107 @@
     await db.ref(path).remove();
     alert('삭제됐어요.');
     document.getElementById('attendanceResult').innerHTML = '<div class="empty-msg">삭제됐습니다.</div>';
+  }
+
+  // 출석률 조회
+  async function loadRate() {
+    const club = document.getElementById('rateClub').value;
+    const from = document.getElementById('rateFrom').value;
+    const to = document.getElementById('rateTo').value;
+    if (!club) { alert('종목을 선택해 주세요.'); return; }
+
+    const snap = await db.ref('/attendance').once('value');
+    const all = snap.val() || {};
+
+    // 해당 종목 학생 목록
+    const clubStudents = allStudents.filter(s => s.club === club);
+    const studentMap = {};
+    clubStudents.forEach(s => { studentMap[s.id] = { ...s, days: new Set() }; });
+
+    // 이 종목이 진행된 날짜 수집
+    // 배구부(남+여) 합반도 포함
+    const clubVariants = getClubVariants(club);
+    const totalDays = new Set();
+
+    Object.entries(all).forEach(([date, sessions]) => {
+      if (from && date < from) return;
+      if (to && date > to) return;
+      Object.values(sessions).forEach(clubs => {
+        Object.entries(clubs).forEach(([sport, students]) => {
+          if (!clubVariants.includes(sport)) return;
+          totalDays.add(date);
+          Object.entries(students).forEach(([sid, r]) => {
+            if (studentMap[sid]) {
+              studentMap[sid].days.add(date);
+            }
+          });
+        });
+      });
+    });
+
+    const totalCount = totalDays.size;
+    const result = document.getElementById('rateResult');
+
+    if (totalCount === 0) {
+      result.innerHTML = '<div class="empty-msg">해당 기간에 출석 기록이 없어요.</div>';
+      document.getElementById('rateSummary').style.display = 'none';
+      return;
+    }
+
+    // 요약 카드
+    const avgRate = clubStudents.length
+      ? Math.round(Object.values(studentMap).reduce((sum, s) => sum + s.days.size, 0) / clubStudents.length / totalCount * 100)
+      : 0;
+
+    document.getElementById('rateSummary').style.display = 'block';
+    document.getElementById('rateSummaryContent').innerHTML = `
+      <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:15px">
+        <div>📅 총 운영 횟수 <b style="color:#1a73e8">${totalCount}회</b></div>
+        <div>👥 등록 학생 <b style="color:#1a73e8">${clubStudents.length}명</b></div>
+        <div>📊 평균 출석률 <b style="color:${avgRate>=80?'#2e7d32':avgRate>=60?'#f57f17':'#c62828'}">${avgRate}%</b></div>
+      </div>`;
+
+    // 학생별 출석률
+    const rows = Object.values(studentMap).sort((a,b) => {
+      if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
+      if (a.class !== b.class) return Number(a.class) - Number(b.class);
+      return Number(a.number) - Number(b.number);
+    });
+
+    result.innerHTML = `
+      <table class="att-table">
+        <tr><th>학년</th><th>반</th><th>번호</th><th>이름</th><th>출석</th><th style="min-width:160px">출석률</th></tr>
+        ${rows.map(s => {
+          const cnt = s.days.size;
+          const rate = totalCount ? Math.round(cnt / totalCount * 100) : 0;
+          const color = rate >= 80 ? '#2e7d32' : rate >= 60 ? '#f57f17' : '#c62828';
+          const bg = rate >= 80 ? '#e8f5e9' : rate >= 60 ? '#fff8e1' : '#ffebee';
+          return `<tr>
+            <td>${s.grade}학년</td><td>${s.class}반</td><td>${s.number}번</td>
+            <td><b>${s.name}</b></td>
+            <td style="color:${color};font-weight:bold">${cnt}/${totalCount}회</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="flex:1;background:#eee;border-radius:6px;height:14px;overflow:hidden">
+                  <div style="width:${rate}%;background:${color};height:100%;border-radius:6px;transition:width 0.3s"></div>
+                </div>
+                <span style="color:${color};font-weight:bold;font-size:13px;width:36px">${rate}%</span>
+              </div>
+            </td>
+          </tr>`;
+        }).join('')}
+      </table>`;
+  }
+
+  // 합반(남+여) 포함 종목 변형 목록 반환
+  function getClubVariants(club) {
+    // 예: "배구부(남)" → ["배구부(남)", "배구부(남+여)"]
+    const variants = [club];
+    const match = club.match(/^(.+?)\((남|여)\)$/);
+    if (match) {
+      variants.push(`${match[1]}(남+여)`);
+    }
+    return variants;
   }
 
   // 미출석 학생 조회
