@@ -306,39 +306,27 @@
     await loadClubs();
   }
 
-  // 스텝 2: 종목 로드
+  // 스텝 2: 종목 로드 (아침/점심/방과후 모두 동일한 목록)
   async function loadClubs() {
     const grid = document.getElementById('clubGrid');
     grid.innerHTML = '<div class="loading">불러오는 중...</div>';
 
-    // 학생 목록 먼저 로드
+    // 학생 목록 로드
     const studentsSnap = await db.ref('/students').once('value');
     allStudents = studentsSnap.val()
       ? Object.entries(studentsSnap.val()).map(([id,s]) => ({id,...s}))
       : [];
 
-    let clubs = [];
+    // 학생 DB에서 모든 종목 자동 추출
+    const rawClubs = [...new Set(allStudents.map(s => s.club).filter(Boolean))].sort();
+    const clubSet = new Set(rawClubs);
 
-    if (currentSession === '아침') {
-      // 학생 DB에서 모든 종목 자동 추출 (요일 제한 없음)
-      const rawClubs = [...new Set(allStudents.map(s => s.club).filter(Boolean))].sort();
+    // 남+여 합반 옵션 자동 추가
+    const combined = [];
+    if (clubSet.has('배구부(남)') && clubSet.has('배구부(여)')) combined.push('배구부(남+여)');
+    if (clubSet.has('축구부(남)') && clubSet.has('축구부(여)')) combined.push('축구부(남+여)');
 
-      // 배구부(남)과 배구부(여)가 모두 있으면 배구부(남+여) 합반 옵션도 추가
-      const combined = [];
-      const clubSet = new Set(rawClubs);
-      if (clubSet.has('배구부(남)') && clubSet.has('배구부(여)')) {
-        combined.push('배구부(남+여)');
-      }
-      if (clubSet.has('축구부(남)') && clubSet.has('축구부(여)')) {
-        combined.push('축구부(남+여)');
-      }
-      clubs = [...rawClubs, ...combined];
-
-    } else {
-      // 점심/방과후: 자율 종목 목록
-      const snap = await db.ref(`/schedule/${currentSession}/sports`).once('value');
-      clubs = snap.val() || [];
-    }
+    const clubs = [...rawClubs, ...combined];
 
     if (!clubs.length) {
       grid.innerHTML = '<div class="empty-msg">등록된 종목이 없어요.</div>';
@@ -347,14 +335,10 @@
 
     grid.innerHTML = '';
     clubs.forEach(club => {
-      // 아침: 해당 종목 학생 수 표시 / 점심·방과후: 전체
-      const count = currentSession === '아침'
-        ? getStudentsForClub(club).length + '명'
-        : '전체';
-
+      const count = getStudentsForClub(club).length;
       const btn = document.createElement('button');
       btn.className = 'club-btn';
-      btn.innerHTML = `${club}<span class="count-badge">${count}</span>`;
+      btn.innerHTML = `${club}<span class="count-badge">${count}명</span>`;
       btn.onclick = () => selectClub(club);
       grid.appendChild(btn);
     });
@@ -380,10 +364,8 @@
   }
 
   function renderStudents() {
-    // 아침: 해당 클럽 학생만 (남+여 합치기 처리 포함) / 점심·방과후: 전체
-    let students = currentSession === '아침'
-      ? getStudentsForClub(currentClub)
-      : allStudents;
+    // 모든 세션: 선택한 종목 학생만 표시 (남+여 합반 처리 포함)
+    let students = getStudentsForClub(currentClub);
 
     students = [...students].sort((a,b) => {
       if (a.grade !== b.grade) return Number(a.grade) - Number(b.grade);
@@ -417,10 +399,25 @@
     });
   }
 
-  // 남+여 합치기 처리: "배구부(남+여)" → 배구부(남), 배구부(여) 학생 모두
+  // 종목명 → 클럽명 변환 (점심/방과후용: "배구(남)" → "배구부(남)")
+  function sportToClub(sport) {
+    // 이미 "부"가 붙어있으면 그대로
+    if (sport.includes('부')) return sport;
+    // 성별 괄호가 있는 경우: "배구(남)" → "배구부(남)"
+    const match = sport.match(/^(.+?)(\(.+\))?$/);
+    if (match) {
+      return match[1] + '부' + (match[2] || '');
+    }
+    return sport + '부';
+  }
+
+  // 종목/클럽 이름으로 학생 필터링 (남+여 합반 처리 포함)
   function getStudentsForClub(clubName) {
-    if (clubName.includes('+')) {
-      const match = clubName.match(/^(.+?)\((.+)\)$/);
+    // 클럽명으로 변환
+    const name = sportToClub(clubName);
+
+    if (name.includes('+')) {
+      const match = name.match(/^(.+?)\((.+)\)$/);
       if (match) {
         const prefix = match[1];
         const variants = match[2].split('+');
@@ -429,7 +426,7 @@
         );
       }
     }
-    return allStudents.filter(s => s.club === clubName);
+    return allStudents.filter(s => s.club === name);
   }
 
   function checkAttendance(student) {
